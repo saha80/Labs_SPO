@@ -17,12 +17,12 @@ int _tmain(const int argc, TCHAR *argv[]) {
 	auto time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	localtime_s(&tm, &time);
 	std::cout << std::put_time(&tm, "%c") << std::endl;
-
 	if (argc < 2) {
 		std::cout << argv[0] << std::endl;
 		system("pause");
 		return 0;
 	}
+
 	if (!CreateProcess(
 		argv[0],
 		argv[1],
