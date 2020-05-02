@@ -7,7 +7,10 @@ using namespace std;
 
 LPCRITICAL_SECTION mutex;
 
-DWORD WINAPI MyThreadFunction(LPVOID lpParam);
+DWORD WINAPI MyThreadFunction(LPVOID lpParam)
+{
+	return {};
+}
 
 int main()
 {
@@ -18,7 +21,6 @@ int main()
 	for (auto &thread : threads)
 	{
 		DWORD thread_id;
-		
 		thread = CreateThread(nullptr, 0, MyThreadFunction, HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(1)), 0, &thread_id);
 	}
 
