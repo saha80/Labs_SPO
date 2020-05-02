@@ -1,0 +1,3 @@
+/home/alex/CLionProjects/Labs_SPO/Lab_2/LINUX/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/alex/CLionProjects/Labs_SPO/Lab_2/LINUX/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/alex/CLionProjects/Labs_SPO/Lab_2/LINUX/cmake-build-debug/CMakeFiles/Lab_2.dir
