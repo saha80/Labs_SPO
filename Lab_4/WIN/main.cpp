@@ -1,49 +1,88 @@
 #include <iostream>
+#include <string>
 #include <vector>
 #include <conio.h>
 #include <Windows.h>
 
+CRITICAL_SECTION critical_section;
+
 using namespace std;
 
-LPCRITICAL_SECTION mutex;
+using handle_heap = std::pair<HANDLE, size_t*>;
 
-DWORD WINAPI MyThreadFunction(LPVOID lpParam)
+DWORD WINAPI PrintFunction(LPVOID param)
 {
-	return {};
+	const auto str = "thread " + to_string(*static_cast<size_t*>(param));
+	while (true)
+	{
+		EnterCriticalSection(&critical_section);
+		for (auto i : str) {
+			cout << i;
+		}
+		cout << endl;
+		LeaveCriticalSection(&critical_section);
+		Sleep(200);
+	}
+}
+
+handle_heap new_thread(const int n)
+{
+	auto heap = static_cast<size_t*>(HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(size_t)));
+	if (!heap) {
+		return {};
+	}
+	*heap = n;
+	DWORD thread_id;
+	return  { CreateThread(nullptr, 0, PrintFunction, heap, 0, &thread_id), heap };
+}
+
+void close_thread(handle_heap &t)
+{
+	TerminateThread(t.first, EXIT_SUCCESS);
+	CloseHandle(t.first);
+	HeapFree(GetProcessHeap(), 0, t.second);
+	t.second = nullptr;
+}
+
+void close_all_threads(vector<handle_heap> &v)
+{
+	while (!v.empty()) {
+		close_thread(v.back());
+		v.pop_back();
+	}
 }
 
 int main()
 {
-	//CreateThread();
-	//PMYDATA pDataArray[MAX_THREADS];
-	vector<HANDLE> threads;
-
-	for (auto &thread : threads)
+	InitializeCriticalSection(&critical_section);
+	vector<handle_heap> threads;
+	while (true)
 	{
-		DWORD thread_id;
-		thread = CreateThread(nullptr, 0, MyThreadFunction, HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(1)), 0, &thread_id);
-	}
-
-	auto is_running = true;
-	while (is_running)
-	{
-		if (_kbhit())
-		{
-			const auto c = _getch();
-			if (c == '+')
-			{
-				//todo: add thread
+		auto c = 0;
+		if (_kbhit()) {
+			c = tolower(_getch());
+		}
+		if (c == '+') {
+			const auto thread = new_thread(threads.size());
+			if (!thread.first || !thread.second) {
+				cerr << "error code " << GetLastError() << endl;
+				close_all_threads(threads);
 			}
-			if (c == '-')
-			{
-				//todo: remove thread
+			threads.push_back(thread);
+		}
+		if (c == '-') {
+			if (!threads.empty()) {
+				close_thread(threads.back());
+				threads.pop_back();
 			}
-			if (c == 'q')
-			{
-				is_running = false;
-				//todo: close threads
+			else {
+				cout << "can't close last thread" << endl;
 			}
-			//todo:
+		}
+		if (c == 'q') {
+			close_all_threads(threads);
+			break;
 		}
 	}
+	DeleteCriticalSection(&critical_section);
 }

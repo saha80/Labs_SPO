@@ -1,5 +1,5 @@
 #include <iostream>
-#include <windows.h>
+#include <Windows.h>
 #include <tchar.h>
 #include <conio.h>
 #include <string>
@@ -7,14 +7,17 @@
 
 using namespace std;
 
-typedef std::pair<HANDLE, HANDLE> handle_pair;
+using handle_pair = std::pair<HANDLE, HANDLE>;
 
 HANDLE new_process(const size_t s, const string& parent_path) {
 	STARTUPINFO si{};
 	PROCESS_INFORMATION pi{};
 	si.cb = sizeof(si);
 	const auto args = " Process " + to_string(s);
-	if (!CreateProcessA(parent_path.c_str(), (LPSTR)args.c_str(), nullptr, nullptr, false, 0, nullptr, nullptr, &si, &pi)) {
+	if (!CreateProcessA(parent_path.c_str(), const_cast<LPSTR>(args.c_str()),
+		nullptr, nullptr, false, 0, nullptr, nullptr,
+		reinterpret_cast<LPSTARTUPINFOA>(&si), &pi))
+	{
 		cerr << "Failed creating process" << endl << "Error status " << GetLastError() << endl;
 		exit(1);
 	}
@@ -59,11 +62,7 @@ int main(const int argc, char *argv[]) {
 	auto is_running = true;
 	auto current_writing = 0u;
 	vector<handle_pair> processes;
-
-	cout << "'+' for creating new process" << endl;
-	cout << "'-' for killing last process" << endl;
-	cout << "'q' for exiting the program" << endl;
-
+	cout << "'+' for creating new process" << endl << "'-' for killing last process" << endl << "'q' for exiting the program" << endl;
 	while (is_running) {
 		if (_kbhit()) {
 			const auto ch = _getch();
@@ -92,10 +91,7 @@ int main(const int argc, char *argv[]) {
 			}
 		}
 		if (!processes.empty()) {
-			++current_writing;
-			if (current_writing >= processes.size()) {
-				current_writing = 0;
-			}
+			if (++current_writing >= processes.size()) { current_writing = 0; }
 			SetEvent(processes[current_writing].second);
 			while (WaitForSingleObject(processes[current_writing].second, 0) == WAIT_OBJECT_0);
 		}
