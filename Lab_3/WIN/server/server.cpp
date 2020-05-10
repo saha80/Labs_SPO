@@ -1,3 +1,4 @@
+#if defined(_WIN32) || defined(_WIN64)
 #include <windows.h> 
 #include <stdio.h> 
 #include <tchar.h>
@@ -144,3 +145,4 @@ void GetAnswerToRequest(LPTSTR pchRequest, LPTSTR pchReply, LPDWORD pchBytes)
 	}
 	*pchBytes = lstrlen(pchReply) + 1;
 }
+#endif
