@@ -1,10 +1,12 @@
 #if defined(_WIN32) || defined(_WIN64)
-#include <Windows.h>
+#include <iostream>
+#include <conio.h>
+
+using namespace std;
 
 int main()
 {
-    //LoadLibraryA();
-    //GetProcAddress();
-    //FreeLibrary();
+	
 }
+
 #endif
