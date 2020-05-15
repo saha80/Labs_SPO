@@ -4,13 +4,14 @@
 
 using namespace std;
 
+void show_time() {
+    auto t = time(nullptr);
+    cout << ctime(&t) << endl;
+}
+
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        cout << "pass at least one arg" << endl;
-        return 0;
-    }
-    if (argc >= 2) { // child
-        cout << "time" << endl;
+    if (argc == 2) { // child
+        show_time();
         return 0;
     }
     pid_t pid = fork();
@@ -22,7 +23,7 @@ int main(int argc, char **argv) {
             execl(argv[0], "some_arg", nullptr);
             break;
         default: // parent
-            cout << "time" << endl;
+            show_time();
             waitpid(pid, nullptr, 0/*wait any child*/);
             break;
     }
