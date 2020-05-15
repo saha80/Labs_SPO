@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/Lab_5.dir/main.cpp.o  -o Lab_5  -Wl,-rpath,/home/alex/CLionProjects/Labs_SPO/Lab_5/LINUX/cmake-build-debug -ldl liba_in_out.so -lpthread 
