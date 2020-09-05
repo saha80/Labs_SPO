@@ -1,2 +1,2 @@
 # Labs_SPO
-TODO: добавить препроцессор(_linux_, _WIN32 || _WIN64)
+TODO: добавить препроцессор(linux, WIN32 || WIN64)
