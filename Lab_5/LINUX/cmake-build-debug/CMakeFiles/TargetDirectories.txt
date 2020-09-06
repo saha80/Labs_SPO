@@ -1,0 +1,4 @@
+/home/alex/CLionProjects/Labs_SPO/Lab_5/LINUX/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/alex/CLionProjects/Labs_SPO/Lab_5/LINUX/cmake-build-debug/CMakeFiles/Lab_5.dir
+/home/alex/CLionProjects/Labs_SPO/Lab_5/LINUX/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/alex/CLionProjects/Labs_SPO/Lab_5/LINUX/cmake-build-debug/CMakeFiles/a_in_out.dir
