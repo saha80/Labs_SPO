@@ -21,6 +21,13 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="filesystem.hpp" />
+    <ClInclude Include="handle_user_input.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data_medium.bin" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{08178574-1418-4569-8A49-B2B2A3188C09}</ProjectGuid>

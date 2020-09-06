@@ -128,6 +128,11 @@
   <ItemGroup>
     <ClInclude Include="FileThreads.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="New Text Document (2).txt" />
+    <Text Include="New Text Document.txt" />
+    <Text Include="output.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

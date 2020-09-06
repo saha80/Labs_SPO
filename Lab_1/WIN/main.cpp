@@ -1,3 +1,4 @@
+#if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
 #include <iostream>
 #include <chrono>
@@ -5,7 +6,7 @@
 #include <sstream>
 #include <tchar.h>
 
-int _tmain(const int argc, TCHAR *argv[]) {
+int main(const int argc, TCHAR *argv[]) {
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 
@@ -44,3 +45,4 @@ int _tmain(const int argc, TCHAR *argv[]) {
 	CloseHandle(pi.hThread);
 	return 0;
 }
+#endif

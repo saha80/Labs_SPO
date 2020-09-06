@@ -1,3 +1,4 @@
+#if defined(_WIN32) || defined(_WIN64)
 #include <iostream>
 #include <Windows.h>
 #include <tchar.h>
@@ -98,3 +99,4 @@ int main(const int argc, char *argv[]) {
 	}
 	return 0;
 }
+#endif

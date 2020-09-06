@@ -18,28 +18,26 @@ extern "C" {
 	__declspec(dllexport) BOOL readFromFile(FileInfo* fileInfo)
 	{
 		BOOL readResult;
-		DWORD numberOfBytesTrasferred;
+		DWORD numberOfBytesTransferred;
 
 		fileInfo->Overlapped.Offset = fileInfo->positionInFile;
 		ReadFile(fileInfo->fileHeader, fileInfo->buffer, fileInfo->numberOfBytes, NULL, &fileInfo->Overlapped);
-		WaitForSingleObject(fileInfo->Overlapped.hEvent, INFINITE);
-		readResult = GetOverlappedResult(fileInfo->fileHeader, &fileInfo->Overlapped, &numberOfBytesTrasferred, FALSE);
+		readResult = GetOverlappedResult(fileInfo->fileHeader, &fileInfo->Overlapped, &numberOfBytesTransferred, TRUE);
 		if (readResult) {
-			fileInfo->positionInFile = fileInfo->positionInFile + numberOfBytesTrasferred;
+			fileInfo->positionInFile = fileInfo->positionInFile + numberOfBytesTransferred;
 		}
 		return readResult;
 	}
 	__declspec(dllexport) BOOL writeToFile(FileInfo* fileInfo)
 	{
 		BOOL writeResult;
-		DWORD numberOfBytesTrasferred;
+		DWORD numberOfBytesTransferred;
 
 		fileInfo->Overlapped.Offset = fileInfo->positionOutFile;
 		WriteFile(fileInfo->fileHeader, fileInfo->buffer, fileInfo->Overlapped.InternalHigh, NULL, &fileInfo->Overlapped);
-		WaitForSingleObject(fileInfo->Overlapped.hEvent, INFINITE);
-		writeResult = GetOverlappedResult(fileInfo->fileHeader, &fileInfo->Overlapped, &numberOfBytesTrasferred, FALSE);
+		writeResult = GetOverlappedResult(fileInfo->fileHeader, &fileInfo->Overlapped, &numberOfBytesTransferred, TRUE);
 		if (writeResult) {
-			fileInfo->positionOutFile = fileInfo->positionOutFile + numberOfBytesTrasferred;
+			fileInfo->positionOutFile = fileInfo->positionOutFile + numberOfBytesTransferred;
 		}
 		return writeResult;
 	}

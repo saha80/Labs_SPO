@@ -1,3 +1,4 @@
+#if defined(_WIN32) || defined(_WIN64)
 #include <conio.h>
 #include <iostream>
 #include <string>
@@ -116,3 +117,4 @@ int main(int argc, char **argv) {
 		}
 	}
 }
+#endif

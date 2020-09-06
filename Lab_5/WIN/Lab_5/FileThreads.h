@@ -17,7 +17,8 @@ struct FileInfo
 	OVERLAPPED Overlapped;
 } fileInfo;
 
-HINSTANCE dinamicLibrary;
+HINSTANCE dynamicLibrary;
+
 HANDLE readerCompleted;
 HANDLE readerStop;
 HANDLE writerCompleted;
@@ -25,33 +26,53 @@ HANDLE writerCompleted;
 DWORD WINAPI threadWriter(PVOID);
 DWORD WINAPI threadReader(PVOID);
 
-HANDLE createEvents();
-void closeEvents(HANDLE);
+inline HANDLE create_events()
+{
+	writerCompleted = CreateEvent(nullptr, FALSE, TRUE, nullptr);
+	readerCompleted = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	readerStop = CreateEvent(nullptr, TRUE, FALSE, nullptr);
+	return CreateEvent(nullptr, FALSE, FALSE, TEXT("_main_event_"));
+}
+
+inline void close_events(HANDLE eventHandler)
+{
+	CloseHandle(writerCompleted);
+	CloseHandle(readerCompleted);
+	CloseHandle(readerStop);
+	CloseHandle(eventHandler);
+}
 
 DWORD WINAPI threadReader(PVOID path)
 {
 	WIN32_FIND_DATA findFileData;
-	HANDLE readFileHandle = NULL;
-	BOOL readResult = false;
-	string folder(((const char*)path));
-	string fileMask = folder + "*.txt";
+	HANDLE readFileHandle = nullptr;
+	auto readResult = FALSE;
+	const string folder(((const char*)path));
+	const auto fileMask = folder + "*.txt";
 	char readFilePath[MAX_PATH];
-	HANDLE findHandle = FindFirstFile(fileMask.c_str(), &findFileData);
-	BOOL(*Read)(FileInfo*) = (BOOL(*)(FileInfo*))GetProcAddress(dinamicLibrary, "readFromFile");
-
-	if (findHandle == INVALID_HANDLE_VALUE)
+	auto findHandle = FindFirstFile(fileMask.c_str(), &findFileData);
+	auto Read = (BOOL(*)(FileInfo*))GetProcAddress(dynamicLibrary, "readFromFile");
+	if (findHandle == INVALID_HANDLE_VALUE) {
 		return EXIT_FAILURE;
+	}
 	while (true)
 	{
 		WaitForSingleObject(writerCompleted, INFINITE);
-		if (readResult == false)
+		if (readResult == FALSE)
 		{
 			fileInfo.positionInFile = 0;
 			strcpy_s(readFilePath, folder.c_str());
 			strcat_s(readFilePath, findFileData.cFileName);
-			readFileHandle = CreateFile(readFilePath, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+			readFileHandle =
+				CreateFile(readFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, nullptr);
 		}
 		fileInfo.fileHeader = readFileHandle;
+		if (fileInfo.fileHeader == INVALID_HANDLE_VALUE) {
+			FindClose(findHandle);
+			CloseHandle(readFileHandle);
+			SetEvent(readerStop);
+			return EXIT_FAILURE;
+		}
 		readResult = (Read)(&fileInfo);
 		if (!readResult && GetLastError() == ERROR_HANDLE_EOF)
 		{
@@ -73,13 +94,12 @@ DWORD WINAPI threadReader(PVOID path)
 
 DWORD WINAPI threadWriter(PVOID path)
 {
-	HANDLE outFileHandle = CreateFile((const char*)path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_OVERLAPPED, NULL);
-	BOOL(*Write)(FileInfo*) = (BOOL(*)(FileInfo*))GetProcAddress(dinamicLibrary, "writeToFile");
+	HANDLE outFileHandle = CreateFile((const char*)path, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_FLAG_OVERLAPPED, nullptr);
+	auto Write = (BOOL(*)(FileInfo*))GetProcAddress(dynamicLibrary, "writeToFile");
 	HANDLE eventsOfReadAndStopRead[2] = { readerCompleted, readerStop };
-	int stopEvent = 1;
-	while (true)
-	{
-		int currentEvent = WaitForMultipleObjects(2, eventsOfReadAndStopRead, FALSE, INFINITE) - WAIT_OBJECT_0;
+	const auto stopEvent = 1;
+	while (true) {
+		const auto currentEvent = WaitForMultipleObjects(2, eventsOfReadAndStopRead, FALSE, INFINITE) - WAIT_OBJECT_0;
 		if (currentEvent == stopEvent) {
 			break;
 		}
@@ -89,22 +109,4 @@ DWORD WINAPI threadWriter(PVOID path)
 	}
 	CloseHandle(outFileHandle);
 	return EXIT_SUCCESS;
-}
-
-HANDLE createEvents()
-{
-	HANDLE eventHandler = CreateEvent(NULL, FALSE, TRUE, TEXT("eventMain")); ;
-	writerCompleted = CreateEvent(NULL, FALSE, TRUE, NULL);
-	readerCompleted = CreateEvent(NULL, FALSE, FALSE, NULL);
-	readerStop = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-	return eventHandler;
-}
-
-void closeEvents(HANDLE eventHandler)
-{
-	CloseHandle(writerCompleted);
-	CloseHandle(readerCompleted);
-	CloseHandle(readerStop);
-	CloseHandle(eventHandler);
 }
