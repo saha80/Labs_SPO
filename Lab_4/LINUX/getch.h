@@ -1,11 +1,5 @@
-//
-// Created by alex on 5/13/20.
-//
 #if defined(__linux__)
-
-#ifndef LAB_3_GETCH_H
-#define LAB_3_GETCH_H
-
+#pragma once
 #include <unistd.h>
 #include <termios.h>
 #include <fcntl.h>
@@ -66,7 +60,5 @@ int getch_(const bool echo) {
 int getch() {
     return getch_(true);
 }
-
-#endif //LAB_3_GETCH_H
 
 #endif //defined(__linux__)
